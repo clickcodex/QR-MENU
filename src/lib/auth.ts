@@ -63,7 +63,7 @@ export async function getSession() {
     // If Kitchen staff, they have user.restaurant
     // If Admin/Owner, they have user.restaurants[0]
     // If Superadmin, fallback to first restaurant in DB if none owned
-    let activeRestaurant = user.restaurant || user.restaurants[0] || null;
+    let activeRestaurant = (user.restaurant || user.restaurants[0] || null) as any;
     if (!activeRestaurant && user.role === 'SUPERADMIN') {
       activeRestaurant = await prisma.restaurant.findFirst({
         orderBy: { createdAt: 'asc' },

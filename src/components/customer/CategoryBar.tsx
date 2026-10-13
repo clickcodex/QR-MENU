@@ -16,7 +16,7 @@ interface CategoryBarProps {
   onSelectCategory: (categoryId: string) => void;
 }
 
-export function CategoryBar({
+function CategoryBarComponent({
   categories,
   selectedCategoryId,
   totalItems,
@@ -103,3 +103,5 @@ export function CategoryBar({
     </div>
   );
 }
+
+export const CategoryBar = React.memo(CategoryBarComponent);

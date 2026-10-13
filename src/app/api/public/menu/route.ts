@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { getPublicMenuData } from '@/lib/menu';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,122 +13,27 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Restaurant slug is required' }, { status: 400 });
     }
 
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { slug: slug.toLowerCase().trim() },
-      include: {
-        categories: {
-          where: { isActive: true },
-          orderBy: { displayOrder: 'asc' },
-          include: {
-            menuItems: {
-              orderBy: [{ displayOrder: 'asc' }, { name: 'asc' }],
-            },
-          },
-        },
+    const result = await getPublicMenuData(slug, tableNumber || undefined);
+
+    if (result.error) {
+      const status = result.isUnavailable ? 403 : 404;
+      return NextResponse.json({ error: result.error }, { status });
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        restaurant: result.restaurant,
+        table: result.table,
+        categories: result.categories,
+        totalItems: result.totalItems,
       },
-    });
-
-    if (!restaurant) {
-      return NextResponse.json(
-        { error: 'Restaurant not found. Please verify the URL or ask the restaurant staff.' },
-        { status: 404 }
-      );
-    }
-
-    if (!restaurant.isActive) {
-      return NextResponse.json(
-        { error: 'This restaurant menu is currently unavailable. Please ask a member of our staff for assistance.' },
-        { status: 403 }
-      );
-    }
-
-    // Resolve table if specified
-    let tableInfo = null;
-    if (tableNumber) {
-      const cleanTable = String(tableNumber).trim();
-      const tableRecord = await prisma.table.findUnique({
-        where: {
-          restaurantId_tableNumber: {
-            restaurantId: restaurant.id,
-            tableNumber: cleanTable,
-          },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
         },
-        include: {
-          qrTokens: { take: 1, orderBy: { createdAt: 'desc' } },
-        },
-      });
-
-      if (tableRecord) {
-        tableInfo = {
-          tableNumber: tableRecord.tableNumber,
-          name: tableRecord.name || `Table ${tableRecord.tableNumber}`,
-          capacity: tableRecord.capacity,
-          isValid: true,
-        };
-
-        // Asynchronously update scan count if qrToken exists
-        if (tableRecord.qrTokens[0]) {
-          prisma.qRToken
-            .update({
-              where: { id: tableRecord.qrTokens[0].id },
-              data: {
-                scansCount: { increment: 1 },
-                lastScannedAt: new Date(),
-              },
-            })
-            .catch(() => {});
-        }
-      } else {
-        tableInfo = {
-          tableNumber: cleanTable,
-          name: `Table ${cleanTable}`,
-          isValid: false,
-        };
       }
-    }
-
-    const sanitizedRestaurant = {
-      id: restaurant.id,
-      name: restaurant.name,
-      slug: restaurant.slug,
-      description: restaurant.description,
-      cuisine: restaurant.cuisine,
-      logoUrl: restaurant.logoUrl,
-      coverUrl: restaurant.coverUrl,
-      address: restaurant.address,
-      phone: restaurant.phone,
-      openingHours: restaurant.openingHours,
-      currencySymbol: restaurant.currencySymbol || '₹',
-    };
-
-    const categories = restaurant.categories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      description: cat.description,
-      displayOrder: cat.displayOrder,
-      items: cat.menuItems.map((item) => ({
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        imageUrl: item.imageUrl,
-        isVeg: item.isVeg,
-        isSpicy: item.isSpicy,
-        isBestseller: item.isBestseller,
-        isAvailable: item.isAvailable,
-        displayOrder: item.displayOrder,
-      })),
-    }));
-
-    const totalItems = categories.reduce((acc, cat) => acc + cat.items.length, 0);
-
-    return NextResponse.json({
-      success: true,
-      restaurant: sanitizedRestaurant,
-      table: tableInfo,
-      categories,
-      totalItems,
-    });
+    );
   } catch (error) {
     console.error('Error fetching public menu:', error);
     return NextResponse.json(

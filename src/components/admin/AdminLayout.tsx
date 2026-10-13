@@ -18,6 +18,7 @@ import {
   Sparkles,
   Receipt,
   Bell,
+  ShieldCheck,
 } from 'lucide-react';
 import { playKitchenChime } from '@/lib/audio';
 

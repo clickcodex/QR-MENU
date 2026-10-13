@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   UtensilsCrossed,
   AlertTriangle,
@@ -21,19 +21,21 @@ import { MenuSkeleton } from './MenuSkeleton';
 import { FloatingCartBar } from './FloatingCartBar';
 import { CartDrawer, CartItem } from './CartDrawer';
 import { LiveOrderModal, ActiveOrderData } from './LiveOrderModal';
+import type { PublicMenuPayload } from '@/lib/menu';
 
 interface CustomerMenuViewProps {
   slug: string;
   tableNumber?: string;
+  initialData?: PublicMenuPayload;
 }
 
-export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [restaurant, setRestaurant] = useState<RestaurantData | null>(null);
-  const [table, setTable] = useState<TableData | null>(null);
-  const [categories, setCategories] = useState<CategoryData[]>([]);
-  const [totalItems, setTotalItems] = useState(0);
+export function CustomerMenuView({ slug, tableNumber, initialData }: CustomerMenuViewProps) {
+  const [loading, setLoading] = useState(!initialData?.restaurant);
+  const [error, setError] = useState<string | null>(initialData?.error || null);
+  const [restaurant, setRestaurant] = useState<RestaurantData | null>(initialData?.restaurant || null);
+  const [table, setTable] = useState<TableData | null>(initialData?.table || null);
+  const [categories, setCategories] = useState<CategoryData[]>(initialData?.categories || []);
+  const [totalItems, setTotalItems] = useState(initialData?.totalItems || 0);
 
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -51,8 +53,8 @@ export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
   // Selected item for modal
   const [selectedItem, setSelectedItem] = useState<MenuItemData | null>(null);
 
-  // Cart Handlers
-  const handleAddToCart = (item: MenuItemData) => {
+  // Cart Handlers with useCallback for zero jank
+  const handleAddToCart = useCallback((item: MenuItemData) => {
     setCart((prev) => {
       const existing = prev.find((c) => c.item.id === item.id);
       if (existing) {
@@ -62,9 +64,9 @@ export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
       }
       return [...prev, { item, quantity: 1 }];
     });
-  };
+  }, []);
 
-  const handleUpdateQty = (itemId: string, delta: number) => {
+  const handleUpdateQty = useCallback((itemId: string, delta: number) => {
     setCart((prev) => {
       return prev
         .map((c) => {
@@ -76,15 +78,19 @@ export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
         })
         .filter(Boolean) as CartItem[];
     });
-  };
+  }, []);
 
-  const handleRemoveItem = (itemId: string) => {
+  const handleRemoveItem = useCallback((itemId: string) => {
     setCart((prev) => prev.filter((c) => c.item.id !== itemId));
-  };
+  }, []);
 
-  const handleClearCart = () => {
+  const handleClearCart = useCallback(() => {
     setCart([]);
-  };
+  }, []);
+
+  const handleSelectItem = useCallback((it: MenuItemData) => {
+    setSelectedItem(it);
+  }, []);
 
   // Cart totals
   const totalCartCount = useMemo(() => cart.reduce((sum, c) => sum + c.quantity, 0), [cart]);
@@ -97,7 +103,7 @@ export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
     return map;
   }, [cart]);
 
-  // Fetch Menu
+  // Fetch Menu (only runs if initialData was not provided by SSR)
   const loadMenu = async () => {
     try {
       setLoading(true);
@@ -125,6 +131,7 @@ export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
   };
 
   useEffect(() => {
+    if (initialData?.restaurant) return;
     loadMenu();
   }, [slug, tableNumber]);
 
@@ -377,7 +384,7 @@ export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
           </div>
         ) : (
           <div className="space-y-8">
-            {filteredCategories.map((category) => {
+            {filteredCategories.map((category, catIndex) => {
               if (category.items.length === 0) return null;
 
               return (
@@ -405,13 +412,14 @@ export function CustomerMenuView({ slug, tableNumber }: CustomerMenuViewProps) {
 
                   {/* Food Cards Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    {category.items.map((item: MenuItemData) => (
+                    {category.items.map((item: MenuItemData, idx: number) => (
                       <FoodCard
                         key={item.id}
                         item={item}
                         currencySymbol={restaurant.currencySymbol}
                         cartQty={cartQtyMap[item.id] || 0}
-                        onSelect={(it) => setSelectedItem(it)}
+                        priority={catIndex === 0 && idx < 4}
+                        onSelect={handleSelectItem}
                         onAddToCart={handleAddToCart}
                         onUpdateCartQty={handleUpdateQty}
                       />

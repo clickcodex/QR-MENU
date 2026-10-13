@@ -36,6 +36,8 @@ next-env.d.ts
 # prisma dev database
 prisma/*.db
 prisma/*.db-journal
+prisma/*.db-shm
+prisma/*.db-wal
 
 # temporary media
 WhatsApp Image*.jpeg

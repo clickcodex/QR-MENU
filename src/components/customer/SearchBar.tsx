@@ -13,7 +13,7 @@ interface SearchBarProps {
   onFilterChange: (filter: DietaryFilter) => void;
 }
 
-export function SearchBar({
+function SearchBarComponent({
   searchQuery,
   onSearchChange,
   activeFilter,
@@ -96,3 +96,5 @@ export function SearchBar({
     </div>
   );
 }
+
+export const SearchBar = React.memo(SearchBarComponent);

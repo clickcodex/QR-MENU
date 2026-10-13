@@ -30,7 +30,7 @@ interface RestaurantHeaderProps {
   table: TableData | null;
 }
 
-export function RestaurantHeader({ restaurant, table }: RestaurantHeaderProps) {
+function RestaurantHeaderComponent({ restaurant, table }: RestaurantHeaderProps) {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
@@ -43,6 +43,7 @@ export function RestaurantHeader({ restaurant, table }: RestaurantHeaderProps) {
             alt={restaurant.name}
             fill
             priority
+            fetchPriority="high"
             sizes="100vw"
             className="object-cover"
           />
@@ -161,3 +162,5 @@ export function RestaurantHeader({ restaurant, table }: RestaurantHeaderProps) {
     </header>
   );
 }
+
+export const RestaurantHeader = React.memo(RestaurantHeaderComponent);

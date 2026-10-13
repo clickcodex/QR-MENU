@@ -9,10 +9,17 @@ export async function GET(req: Request) {
   const port = portMatch ? portMatch[1] : '3000';
   const lanIp = getLocalNetworkIp();
 
-  return NextResponse.json({
-    lanIp,
-    port,
-    lanBaseUrl: `http://${lanIp}:${port}`,
-    localBaseUrl: `http://localhost:${port}`,
-  });
+  return NextResponse.json(
+    {
+      lanIp,
+      port,
+      lanBaseUrl: `http://${lanIp}:${port}`,
+      localBaseUrl: `http://localhost:${port}`,
+    },
+    {
+      headers: {
+        'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+      },
+    }
+  );
 }

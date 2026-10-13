@@ -17,9 +17,10 @@ export const ORDER_STATUS_STEPS: Array<{ key: OrderStatus; label: string; shortD
 interface OrderStatusPathProps {
   currentStatus: OrderStatus | string;
   size?: 'sm' | 'md';
+  compact?: boolean;
 }
 
-export function OrderStatusPath({ currentStatus, size = 'md' }: OrderStatusPathProps) {
+export function OrderStatusPath({ currentStatus, size = 'md', compact = false }: OrderStatusPathProps) {
   const currentIndex = ORDER_STATUS_STEPS.findIndex((s) => s.key === currentStatus);
 
   return (

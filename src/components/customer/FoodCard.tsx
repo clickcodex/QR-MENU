@@ -22,15 +22,17 @@ interface FoodCardProps {
   item: MenuItemData;
   currencySymbol?: string;
   cartQty?: number;
+  priority?: boolean;
   onSelect: (item: MenuItemData) => void;
   onAddToCart?: (item: MenuItemData) => void;
   onUpdateCartQty?: (itemId: string, delta: number) => void;
 }
 
-export function FoodCard({
+function FoodCardComponent({
   item,
   currencySymbol = '₹',
   cartQty = 0,
+  priority = false,
   onSelect,
   onAddToCart,
   onUpdateCartQty,
@@ -75,7 +77,8 @@ export function FoodCard({
               !isAvailable ? 'grayscale' : ''
             }`}
             onError={() => setImgError(true)}
-            loading="lazy"
+            priority={priority}
+            loading={priority ? undefined : 'lazy'}
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center bg-[#F7F5F0] text-[#A8A29E] p-2 text-center">
@@ -194,3 +197,5 @@ export function FoodCard({
     </div>
   );
 }
+
+export const FoodCard = React.memo(FoodCardComponent);

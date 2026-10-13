@@ -1,7 +1,9 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import prisma from '@/lib/prisma';
 import { CustomerMenuView } from '@/components/customer/CustomerMenuView';
+import { getPublicMenuData, getCachedRestaurantMenu } from '@/lib/menu';
+
+export const revalidate = 60;
 
 interface PageProps {
   params: {
@@ -11,16 +13,15 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const restaurant = await prisma.restaurant.findUnique({
-    where: { slug: params.slug },
-    select: { name: true, cuisine: true },
-  });
+  const data = await getCachedRestaurantMenu(params.slug);
 
-  if (!restaurant) {
+  if (!data?.restaurant) {
     return {
       title: 'Restaurant Not Found — MOMO MENU',
     };
   }
+
+  const { restaurant } = data;
 
   return {
     title: `${restaurant.name} (Table ${params.table}) — Digital QR Menu | MOMO MENU`,
@@ -28,6 +29,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default function TableMenuPage({ params }: PageProps) {
-  return <CustomerMenuView slug={params.slug} tableNumber={params.table} />;
+export default async function TableMenuPage({ params }: PageProps) {
+  const initialData = await getPublicMenuData(params.slug, params.table);
+  return <CustomerMenuView slug={params.slug} tableNumber={params.table} initialData={initialData} />;
 }

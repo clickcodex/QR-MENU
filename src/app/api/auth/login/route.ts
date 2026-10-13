@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     // Resolve restaurant
-    let restaurant = user.restaurant || user.restaurants[0] || null;
+    let restaurant = (user.restaurant || user.restaurants[0] || null) as any;
     if (!restaurant && user.role === 'SUPERADMIN') {
       restaurant = await prisma.restaurant.findFirst({
         orderBy: { createdAt: 'asc' },
