@@ -49,11 +49,12 @@ export async function GET(req: Request) {
 
   // Calculate live summary stats
   const pendingOrders = orders.filter((o) => o.status === 'PENDING');
-  const acceptedOrders = orders.filter((o) => o.status === 'ACCEPTED');
-  const preparingOrders = orders.filter((o) => o.status === 'PREPARING');
-  const readyOrders = orders.filter((o) => o.status === 'READY');
-  const servedOrders = orders.filter((o) => o.status === 'SERVED');
-  const completedOrders = orders.filter((o) => o.status === 'COMPLETED');
+  const acceptedOrders = orders.filter(
+    (o) => o.status === 'ACCEPTED' || o.status === 'PREPARING' || o.status === 'READY'
+  );
+  const deliveredOrders = orders.filter(
+    (o) => o.status === 'DELIVERED' || o.status === 'SERVED' || o.status === 'COMPLETED'
+  );
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
 
   return NextResponse.json({
@@ -62,10 +63,7 @@ export async function GET(req: Request) {
       totalOrders: orders.length,
       pendingCount: pendingOrders.length,
       acceptedCount: acceptedOrders.length,
-      preparingCount: preparingOrders.length,
-      readyCount: readyOrders.length,
-      servedCount: servedOrders.length,
-      completedCount: completedOrders.length,
+      deliveredCount: deliveredOrders.length,
       totalRevenue: Math.round(totalRevenue * 100) / 100,
       currencySymbol: session.restaurant?.currencySymbol || '₹',
     },
@@ -80,7 +78,8 @@ export async function GET(req: Request) {
   });
 }
 
-const VALID_STATUS_PATH = ['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED', 'COMPLETED'];
+// Supported order lifecycle statuses
+const VALID_STATUSES = ['PENDING', 'ACCEPTED', 'DELIVERED', 'PREPARING', 'READY', 'SERVED', 'COMPLETED'];
 
 export async function PUT(req: Request) {
   const session = await getSession();
@@ -94,18 +93,10 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'orderId and status are required' }, { status: 400 });
     }
 
-    if (!VALID_STATUS_PATH.includes(status)) {
+    if (!VALID_STATUSES.includes(status)) {
       return NextResponse.json(
-        { error: `Invalid status. Path must be: ${VALID_STATUS_PATH.join(' -> ')}` },
+        { error: `Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}` },
         { status: 400 }
-      );
-    }
-
-    // Role boundary: Kitchen section can ONLY accept orders and do their thing till SERVED (delivered to table)
-    if (session.user.role === 'KITCHEN' && status === 'COMPLETED') {
-      return NextResponse.json(
-        { error: 'Kitchen staff can only deliver orders (SERVED). Only Admin/Billing can mark orders COMPLETED.' },
-        { status: 403 }
       );
     }
 
@@ -120,17 +111,6 @@ export async function PUT(req: Request) {
     // If not super admin, must match assigned/owned restaurant
     if (session.user.role !== 'SUPERADMIN' && existing.restaurantId !== session.restaurant?.id) {
       return NextResponse.json({ error: 'Access denied to this order' }, { status: 403 });
-    }
-
-    // Verify forward progression without skipping or going backwards
-    const currentIndex = VALID_STATUS_PATH.indexOf(existing.status);
-    const nextIndex = VALID_STATUS_PATH.indexOf(status);
-
-    if (nextIndex <= currentIndex && existing.status !== status) {
-      return NextResponse.json(
-        { error: 'Statuses never go backwards in the order lifecycle.' },
-        { status: 400 }
-      );
     }
 
     const updated = await prisma.order.update({

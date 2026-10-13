@@ -70,55 +70,56 @@ export function LiveOrderModal({
     switch (order.status) {
       case 'PENDING':
         return {
-          title: 'Order Sent to Kitchen',
-          badgeText: 'Awaiting Kitchen Approval',
+          title: 'Order Placed Successfully',
+          badgeText: 'Awaiting Acceptance',
           badgeClass: 'bg-amber-100 text-amber-800 border-amber-300',
-          desc: 'Your order was submitted directly to the kitchen display station. Chef is reviewing it now.',
+          desc: 'Your order was received by the restaurant. Staff is reviewing it now.',
           icon: Clock,
           iconColor: 'text-amber-600 bg-amber-50 border-amber-200',
         };
       case 'ACCEPTED':
         return {
-          title: 'Order Approved by Kitchen',
-          badgeText: 'Order Confirmed',
+          title: 'Order Accepted',
+          badgeText: 'Accepted & Preparing',
           badgeClass: 'bg-blue-100 text-blue-800 border-blue-300',
-          desc: 'The kitchen station accepted your order. Ingredients are being prepped.',
+          desc: 'The restaurant accepted your order. Your dishes are being prepared.',
           icon: CheckCircle2,
           iconColor: 'text-blue-600 bg-blue-50 border-blue-200',
         };
       case 'PREPARING':
         return {
-          title: 'Cooking in Progress',
-          badgeText: 'Chefs are Cooking',
+          title: 'Preparing Your Food',
+          badgeText: 'Dishes Cooking',
           badgeClass: 'bg-orange-100 text-orange-800 border-orange-300',
-          desc: 'Your dishes are currently on the stove and in the tandoor/ovens.',
+          desc: 'Your dishes are being prepared right now.',
           icon: Flame,
           iconColor: 'text-orange-600 bg-orange-50 border-orange-200',
         };
       case 'READY':
         return {
           title: 'Food Plated & Ready',
-          badgeText: 'Ready at the Pass',
+          badgeText: 'Ready to Serve',
           badgeClass: 'bg-purple-100 text-purple-800 border-purple-300',
-          desc: 'Dishes are freshly plated and your table server is bringing them right now.',
+          desc: 'Your dishes are freshly prepared and being served to your table now.',
           icon: UtensilsCrossed,
           iconColor: 'text-purple-600 bg-purple-50 border-purple-200',
         };
+      case 'DELIVERED':
       case 'SERVED':
         return {
           title: 'Delivered to Your Table',
-          badgeText: 'Served ✓ Enjoy Your Meal',
+          badgeText: 'Delivered ✓ Enjoy Your Meal',
           badgeClass: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-          desc: 'All dishes have been delivered to Table ' + order.tableNumber + '. Bon appétit!',
+          desc: 'All dishes have been delivered to Table ' + order.tableNumber + '. Enjoy your meal!',
           icon: CheckCircle2,
           iconColor: 'text-emerald-600 bg-emerald-50 border-emerald-200',
         };
       case 'COMPLETED':
         return {
-          title: 'Bill Settled & Complete',
-          badgeText: 'Order Closed',
+          title: 'Order Completed',
+          badgeText: 'Completed ✓',
           badgeClass: 'bg-slate-100 text-slate-800 border-slate-300',
-          desc: 'This table bill has been settled. Thank you for dining with us!',
+          desc: 'This table order has been completed. Thank you for dining with us!',
           icon: ShieldCheck,
           iconColor: 'text-slate-600 bg-slate-50 border-slate-200',
         };
@@ -167,7 +168,7 @@ export function LiveOrderModal({
                 </span>
               </div>
               <p className="text-xs text-[#78716C]">
-                Table {order.tableNumber} • Real-time kitchen updates
+                Table {order.tableNumber} • Real-time order updates
               </p>
             </div>
           </div>
@@ -236,7 +237,7 @@ export function LiveOrderModal({
 
             {order.notes && (
               <div className="p-2.5 rounded-xl bg-[#FFFDF0] border border-[#E5DFB0] text-xs text-[#713F12]">
-                <strong>Kitchen Note:</strong> {order.notes}
+                <strong>Special Note:</strong> {order.notes}
               </div>
             )}
 

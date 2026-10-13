@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     if (user.role === 'SUPERADMIN') {
       redirectTo = '/superadmin';
     } else if (user.role === 'KITCHEN') {
-      redirectTo = '/kitchen/orders';
+      redirectTo = '/admin/orders';
     }
 
     const token = signAdminToken({

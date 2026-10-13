@@ -179,7 +179,7 @@ export function CartDrawer({
                 {placedOrder
                   ? 'Live Order Tracking'
                   : isConfirming
-                  ? 'Confirm Your Order'
+                  ? 'Review Order'
                   : 'Table Order & Bill'}
               </h2>
               <p className="text-xs text-[#78716C]">
@@ -209,10 +209,10 @@ export function CartDrawer({
                 Order #{placedOrder.orderNumber} Confirmed
               </span>
               <h3 className="text-xl font-black text-[#1C1917]">
-                Order Sent to Kitchen!
+                Order Placed Successfully!
               </h3>
               <p className="text-xs text-[#57534E] max-w-sm mx-auto leading-relaxed">
-                Your order for <strong>Table {placedOrder.tableNumber}</strong> has been received by the kitchen station.
+                Your order for <strong>Table {placedOrder.tableNumber}</strong> has been received by the restaurant.
               </p>
             </div>
 
@@ -285,7 +285,7 @@ export function CartDrawer({
                     Live Order in Progress ({activeOrder.status})
                   </h3>
                   <p className="text-xs text-[#78716C] mt-1 max-w-xs mx-auto">
-                    Your previous order is currently with the kitchen. Tap below to track real-time status.
+                    Your order is currently being prepared. Tap below to track real-time status.
                   </p>
                 </div>
 
@@ -422,7 +422,7 @@ export function CartDrawer({
                 ) : (
                   <>
                     <Check className="w-5 h-5" />
-                    <span>Confirm to Place Order ({currencySymbol}{grandTotal.toFixed(2)})</span>
+                    <span>Confirm Order ({currencySymbol}{grandTotal.toFixed(2)})</span>
                   </>
                 )}
               </button>
@@ -545,7 +545,7 @@ export function CartDrawer({
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-[#57534E] flex items-center gap-1.5">
                 <MessageSquare className="w-3.5 h-3.5 text-[#E86326]" />
-                <span>Special Instructions for Kitchen (Optional)</span>
+                <span>Special Instructions (Optional)</span>
               </label>
               <input
                 type="text"
@@ -583,11 +583,11 @@ export function CartDrawer({
                 onClick={() => setIsConfirming(true)}
                 className="w-full py-3.5 px-4 rounded-2xl bg-[#E86326] hover:bg-[#D34F15] text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shadow-hover"
               >
-                <span>Proceed to Confirm Order ({currencySymbol}{grandTotal.toFixed(2)})</span>
+                <span>Review Order ({currencySymbol}{grandTotal.toFixed(2)})</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <p className="text-[10px] text-center text-[#78716C] mt-2">
-                Review your items before sending to the kitchen.
+                Review your dishes before confirming your order.
               </p>
             </div>
           </div>

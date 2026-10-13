@@ -48,11 +48,6 @@ export default function AdminLoginPage() {
     setError(null);
   };
 
-  const handleFillKitchen = () => {
-    setEmail('kitchen@urbanspice.in');
-    setPassword('kitchen123');
-    setError(null);
-  };
 
   return (
     <div className="min-h-screen bg-[#FAFAF8] flex flex-col justify-center items-center p-4">
@@ -75,7 +70,7 @@ export default function AdminLoginPage() {
           <div>
             <h2 className="text-lg font-bold text-[#1C1917]">Welcome Back</h2>
             <p className="text-xs text-[#78716C] mt-0.5">
-              Sign in with your Owner, Kitchen, or Super Admin credentials.
+              Sign in with your Owner Admin or Super Admin credentials.
             </p>
           </div>
 
@@ -147,36 +142,25 @@ export default function AdminLoginPage() {
               <Sparkles className="w-3 h-3 text-[#E86326]" /> Quick Role Demo Accounts
             </span>
 
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={handleFillOwner}
-                className="py-1.5 px-2 bg-white hover:bg-[#FFF7ED] border border-[#FED7AA] text-[10px] font-bold text-[#9A3412] rounded-lg transition"
+                className="py-2 px-3 bg-white hover:bg-[#FFF7ED] border border-[#FED7AA] text-xs font-bold text-[#9A3412] rounded-xl transition text-center"
               >
-                Owner
-              </button>
-              <button
-                type="button"
-                onClick={handleFillKitchen}
-                className="py-1.5 px-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-bold text-amber-300 rounded-lg transition"
-              >
-                Kitchen
+                Owner Admin
               </button>
               <button
                 type="button"
                 onClick={handleFillSuperAdmin}
-                className="py-1.5 px-2 bg-amber-500 hover:bg-amber-400 text-[10px] font-black text-slate-950 rounded-lg transition"
+                className="py-2 px-3 bg-amber-500 hover:bg-amber-400 text-xs font-black text-slate-950 rounded-xl transition text-center"
               >
                 👑 Super Admin
               </button>
             </div>
           </div>
 
-          <div className="pt-2 text-center text-xs text-[#78716C] flex items-center justify-center gap-4">
-            <a href="/kitchen/login" className="hover:text-[#E86326] underline font-semibold transition">
-              Kitchen Display Login
-            </a>
-            <span>•</span>
+          <div className="pt-2 text-center text-xs text-[#78716C]">
             <a href="/" className="hover:text-[#1C1917] transition">
               Back to Home
             </a>

@@ -94,7 +94,7 @@ export function PrintableReceipt({
                 <p className="text-[11px] text-[#444]">Tel: {restaurantPhone}</p>
               )}
               <div className="pt-1 text-[10px] tracking-widest uppercase font-bold text-[#666]">
-                *** KITCHEN ORDER TICKET & BILL ***
+                *** RESTAURANT ORDER TICKET & BILL ***
               </div>
             </div>
 

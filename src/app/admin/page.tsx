@@ -221,7 +221,7 @@ export default function AdminDashboardPage() {
                     <span className="text-[10px] text-[#C2410C] font-normal">
                       {stats.pendingOrders > 0
                         ? `${stats.pendingOrders} pending confirmation`
-                        : 'Kitchen radar & receipts'}
+                        : 'Table orders & history'}
                     </span>
                   </div>
                 </div>

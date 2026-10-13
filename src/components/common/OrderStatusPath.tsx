@@ -3,15 +3,19 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-export type OrderStatus = 'PENDING' | 'ACCEPTED' | 'PREPARING' | 'READY' | 'SERVED' | 'COMPLETED';
+export type OrderStatus =
+  | 'PENDING'
+  | 'ACCEPTED'
+  | 'DELIVERED'
+  | 'PREPARING'
+  | 'READY'
+  | 'SERVED'
+  | 'COMPLETED';
 
-export const ORDER_STATUS_STEPS: Array<{ key: OrderStatus; label: string; shortDesc: string }> = [
-  { key: 'PENDING', label: 'PENDING', shortDesc: 'Order Received' },
-  { key: 'ACCEPTED', label: 'ACCEPTED', shortDesc: 'Confirmed' },
-  { key: 'PREPARING', label: 'PREPARING', shortDesc: 'In Kitchen' },
-  { key: 'READY', label: 'READY', shortDesc: 'Food Ready' },
-  { key: 'SERVED', label: 'SERVED', shortDesc: 'Served to Table' },
-  { key: 'COMPLETED', label: 'COMPLETED', shortDesc: 'Bill Settled' },
+export const ORDER_STATUS_STEPS: Array<{ key: string; label: string; shortDesc: string }> = [
+  { key: 'PENDING', label: '1. PENDING', shortDesc: 'New Order' },
+  { key: 'ACCEPTED', label: '2. ACCEPTED', shortDesc: 'Preparing' },
+  { key: 'DELIVERED', label: '3. DELIVERED', shortDesc: 'Served to Table' },
 ];
 
 interface OrderStatusPathProps {
@@ -21,29 +25,40 @@ interface OrderStatusPathProps {
 }
 
 export function OrderStatusPath({ currentStatus, size = 'md', compact = false }: OrderStatusPathProps) {
-  const currentIndex = ORDER_STATUS_STEPS.findIndex((s) => s.key === currentStatus);
+  // Normalize status into the 3 core stages
+  let normalizedKey = 'PENDING';
+  if (currentStatus === 'ACCEPTED' || currentStatus === 'PREPARING' || currentStatus === 'READY') {
+    normalizedKey = 'ACCEPTED';
+  } else if (
+    currentStatus === 'DELIVERED' ||
+    currentStatus === 'SERVED' ||
+    currentStatus === 'COMPLETED'
+  ) {
+    normalizedKey = 'DELIVERED';
+  }
+
+  const currentIndex = ORDER_STATUS_STEPS.findIndex((s) => s.key === normalizedKey);
 
   return (
     <div className="w-full space-y-1.5">
       <div className="flex items-center justify-between text-[11px] font-bold text-[#E86326] uppercase tracking-wider">
-        <span>Order Status Path</span>
+        <span>Order Status</span>
         <span className="text-[10px] text-[#78716C] font-normal normal-case">
-          Statuses never skip or go backwards
+          Pending → Accepted → Delivered
         </span>
       </div>
 
       {/* Breadcrumb Stepper Strip */}
-      <div className="grid grid-cols-6 rounded-xl overflow-hidden border border-[#D34F15]/30 bg-[#FFF7ED] text-center shadow-xs">
+      <div className="grid grid-cols-3 rounded-xl overflow-hidden border border-[#D34F15]/30 bg-[#FFF7ED] text-center shadow-xs">
         {ORDER_STATUS_STEPS.map((step, idx) => {
           const isCurrent = idx === currentIndex;
           const isPassed = idx < currentIndex;
-          const isUpcoming = idx > currentIndex;
 
           let bgClasses = 'bg-[#FAFAF8] text-[#A8A29E]';
           if (isCurrent) {
             bgClasses = 'bg-[#E86326] text-white font-black shadow-inner';
           } else if (isPassed) {
-            bgClasses = 'bg-[#C2410C] text-white/90 font-bold';
+            bgClasses = 'bg-[#16A34A] text-white font-bold';
           } else {
             bgClasses = 'bg-[#F5F5F0] text-[#78716C] font-semibold opacity-70';
           }
@@ -51,18 +66,27 @@ export function OrderStatusPath({ currentStatus, size = 'md', compact = false }:
           return (
             <div
               key={step.key}
-              className={`py-2 px-1 flex flex-col items-center justify-center border-r border-white/20 last:border-r-0 transition-colors ${bgClasses}`}
+              className={`py-2 px-1.5 flex flex-col items-center justify-center border-r border-white/20 last:border-r-0 transition-colors ${bgClasses}`}
             >
               <div className="flex items-center gap-1">
-                {isPassed && <Check className="w-3 h-3 text-white flex-shrink-0" />}
+                {isPassed && <Check className="w-3.5 h-3.5 text-white flex-shrink-0" />}
                 <span
                   className={`${
-                    size === 'sm' ? 'text-[9px] sm:text-[10px]' : 'text-[10px] sm:text-xs'
+                    size === 'sm' ? 'text-[10px] sm:text-[11px]' : 'text-xs sm:text-xs'
                   } tracking-wider font-extrabold truncate`}
                 >
                   {step.label}
                 </span>
               </div>
+              {!compact && (
+                <span
+                  className={`text-[9px] ${
+                    isCurrent ? 'text-white/90' : isPassed ? 'text-white/80' : 'text-[#A8A29E]'
+                  }`}
+                >
+                  {step.shortDesc}
+                </span>
+              )}
             </div>
           );
         })}

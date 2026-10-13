@@ -279,7 +279,7 @@ export function CustomerMenuView({ slug, tableNumber, initialData }: CustomerMen
       {/* 1. Restaurant Header */}
       <RestaurantHeader restaurant={restaurant} table={table} />
 
-      {/* 2. Active Live Order Sticky Banner (Never disappears when kitchen is preparing dishes) */}
+      {/* 2. Active Live Order Sticky Banner */}
       {activeOrder && activeOrder.status !== 'COMPLETED' && (
         <div className="bg-[#FFF7ED] border-b border-[#FED7AA] px-4 py-2.5 shadow-2xs sticky top-0 z-30">
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
@@ -301,14 +301,10 @@ export function CustomerMenuView({ slug, tableNumber, initialData }: CustomerMen
                 </div>
                 <p className="text-[11px] text-[#78716C] truncate mt-0.5">
                   {activeOrder.status === 'PENDING'
-                    ? 'Order sent to kitchen • Awaiting approval'
-                    : activeOrder.status === 'ACCEPTED'
-                    ? 'Approved by kitchen • Food prep starting'
-                    : activeOrder.status === 'PREPARING'
-                    ? 'Chefs are cooking your dishes right now'
-                    : activeOrder.status === 'READY'
-                    ? 'Plated and ready! Serving to table'
-                    : 'Served to table ✓ Enjoy your meal!'}
+                    ? 'Order placed • Awaiting restaurant approval'
+                    : activeOrder.status === 'ACCEPTED' || activeOrder.status === 'PREPARING' || activeOrder.status === 'READY'
+                    ? 'Order accepted • Food is being prepared'
+                    : 'Delivered to table ✓ Enjoy your meal!'}
                 </p>
               </div>
             </div>

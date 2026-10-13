@@ -22,7 +22,6 @@ import {
   LogOut,
   Eye,
   EyeOff,
-  ChefHat,
   ArrowUpRight,
   Receipt,
   X,
@@ -384,14 +383,6 @@ export default function SuperAdminPage() {
             >
               <Building2 className="w-4 h-4 text-amber-400" />
               <span>Owner Admin</span>
-            </Link>
-
-            <Link
-              href="/kitchen/orders"
-              className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition"
-            >
-              <ChefHat className="w-4 h-4 text-emerald-400" />
-              <span>Kitchen Station</span>
             </Link>
 
             <button

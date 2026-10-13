@@ -104,13 +104,3 @@ export async function getSuperAdminSession() {
   }
   return session;
 }
-
-export async function getKitchenSession() {
-  const session = await getSession();
-  if (!session) return null;
-  // Kitchen orders portal accessible to KITCHEN, ADMIN, and SUPERADMIN
-  if (session.user.role !== 'KITCHEN' && session.user.role !== 'ADMIN' && session.user.role !== 'SUPERADMIN') {
-    return null;
-  }
-  return session;
-}

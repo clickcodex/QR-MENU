@@ -14,7 +14,6 @@ import {
   ExternalLink,
   Menu as MenuIcon,
   X,
-  ChefHat,
   Sparkles,
   Receipt,
   Bell,
@@ -83,7 +82,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         if (!isFirstCheckRef.current) {
           const brandNew = orders.find((o: any) => !knownOrderIdsRef.current.has(o.id));
           if (brandNew) {
-            // Audio chime is exclusive to Kitchen section; admin gets visual update
+            playKitchenChime();
             setGlobalToast({
               id: brandNew.id,
               orderNumber: brandNew.orderNumber,
@@ -120,8 +119,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const navItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Live Orders', href: '/admin/orders', icon: Receipt, badge: pendingCount },
-    { name: 'Kitchen Station (KDS)', href: '/kitchen/orders', icon: ChefHat },
+    { name: 'Orders & History', href: '/admin/orders', icon: Receipt, badge: pendingCount },
     { name: 'Menu Items', href: '/admin/menu', icon: Utensils },
     { name: 'Categories', href: '/admin/categories', icon: FolderTree },
     { name: 'Tables & QR Codes', href: '/admin/tables', icon: QrCode },
@@ -193,7 +191,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <div className="mt-4 p-2.5 rounded-xl bg-[#FFFDF8] border border-[#F5EAD4] space-y-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="w-7 h-7 rounded-lg bg-[#FFEDD5] text-[#E86326] flex items-center justify-center font-bold text-xs flex-shrink-0">
-                    <ChefHat className="w-3.5 h-3.5" />
+                    <Store className="w-3.5 h-3.5" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-[#1C1917] truncate leading-tight">
@@ -335,16 +333,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Kitchen Station Direct Access */}
-            <Link
-              href="/kitchen/orders"
-              target="_blank"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-900 text-amber-300 hover:bg-slate-800 transition shadow-sm"
-            >
-              <ChefHat className="w-3.5 h-3.5 text-amber-400" />
-              <span>Kitchen Screen (KDS)</span>
-            </Link>
-
             {/* Live Orders Quick Indicator */}
             <Link
               href="/admin/orders"

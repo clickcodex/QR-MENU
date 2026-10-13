@@ -11,8 +11,8 @@ import {
   ShieldCheck,
   CheckCircle2,
   Users,
-  ChefHat,
   Zap,
+  UtensilsCrossed,
   Printer,
   ExternalLink,
 } from 'lucide-react';
@@ -40,14 +40,6 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              href="/kitchen/login"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 text-amber-300 hover:bg-slate-800 text-xs font-bold transition shadow-sm border border-slate-700"
-            >
-              <ChefHat className="w-3.5 h-3.5 text-amber-400" />
-              <span>Kitchen Section</span>
-            </Link>
-
             <Link
               href="/admin/login"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#FFF7ED] text-[#E86326] border border-[#FED7AA] hover:bg-[#FFEDD5] text-xs font-bold transition"
@@ -116,7 +108,7 @@ export default function HomePage() {
               href="/admin/login"
               className="py-3 px-5 rounded-2xl bg-[#FFFDF8] hover:bg-[#FFF7ED] border border-[#FED7AA] text-[#9A3412] text-xs sm:text-sm font-bold transition flex items-center gap-2"
             >
-              <ChefHat className="w-4 h-4 text-[#E86326]" />
+              <ShieldCheck className="w-4 h-4 text-[#E86326]" />
               <span>Admin Dashboard</span>
             </Link>
           </div>
@@ -202,7 +194,7 @@ export default function HomePage() {
             {/* Card 3: Restaurant Admin Command */}
             <div className="p-6 rounded-3xl bg-[#FFFDF8] border border-[#F5EAD4] space-y-4 shadow-subtle">
               <div className="w-12 h-12 rounded-2xl bg-orange-50 text-[#D34F15] flex items-center justify-center">
-                <ChefHat className="w-6 h-6" />
+                <UtensilsCrossed className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-[#1C1917]">
                 Clean Restaurant Admin

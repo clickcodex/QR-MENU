@@ -179,44 +179,6 @@ export default function AdminSettingsPage() {
           </p>
         </div>
 
-        {/* Staff & Kitchen Section Credentials */}
-        <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#EAEAE5] shadow-subtle space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-bold text-[#1C1917]">Kitchen Staff Login Information</h2>
-              <p className="text-xs text-[#78716C]">
-                Your kitchen team logs in with these credentials to accept, cook, and deliver orders.
-              </p>
-            </div>
-            <a
-              href="/kitchen/orders"
-              target="_blank"
-              className="px-3 py-1.5 rounded-xl bg-slate-900 text-amber-300 text-xs font-bold hover:bg-slate-800 transition"
-            >
-              Open Kitchen KDS Screen ↗
-            </a>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#FFFDF8] border border-[#FED7AA] space-y-2 text-xs">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 font-mono">
-              <div>
-                <span className="text-[#78716C]">Kitchen Login ID:</span>{' '}
-                <strong className="text-[#1C1917]">kitchen@urbanspice.in</strong>
-              </div>
-              <div>
-                <span className="text-[#78716C]">Password:</span>{' '}
-                <strong className="text-[#1C1917]">kitchen123</strong>
-              </div>
-              <div className="text-emerald-700 font-sans font-bold">
-                Role: KITCHEN
-              </div>
-            </div>
-            <p className="text-[11px] text-[#9A3412] font-sans">
-              Kitchen staff can accept pending orders, update cooking stages, and deliver dishes to tables. They cannot modify prices or billing. Super Admin can update these credentials anytime.
-            </p>
-          </div>
-        </div>
-
         {/* Multi-Tenant Security & Isolation Info */}
         <div className="bg-white rounded-3xl p-6 sm:p-7 border border-[#EAEAE5] shadow-subtle space-y-3">
           <div className="flex items-center gap-3">

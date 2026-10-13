@@ -17,6 +17,30 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/kitchen',
+        destination: '/admin/orders',
+        permanent: false,
+      },
+      {
+        source: '/kitchen/orders',
+        destination: '/admin/orders',
+        permanent: false,
+      },
+      {
+        source: '/kitchen/login',
+        destination: '/admin/login',
+        permanent: false,
+      },
+      {
+        source: '/kitchen/:path*',
+        destination: '/admin/orders',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

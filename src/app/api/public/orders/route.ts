@@ -133,7 +133,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Order placed successfully and sent to kitchen',
+      message: 'Order placed successfully.',
       order: {
         id: order.id,
         orderNumber: order.orderNumber,
@@ -202,7 +202,7 @@ export async function GET(req: Request) {
           where: {
             restaurantId: restaurant.id,
             tableNumber: { in: [cleanTable, normalized, `Table ${normalized}`] },
-            status: { in: ['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'SERVED'] },
+            status: { in: ['PENDING', 'ACCEPTED', 'DELIVERED', 'PREPARING', 'READY', 'SERVED'] },
             createdAt: { gte: fourHoursAgo },
           },
           orderBy: { createdAt: 'desc' },
