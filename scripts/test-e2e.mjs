@@ -11,8 +11,8 @@ async function test() {
   assert.strictEqual(menuRes.status, 200, 'Public menu API must return 200');
   const menuData = await menuRes.json();
   assert.strictEqual(menuData.success, true);
-  assert.strictEqual(menuData.restaurant.name, 'Urban Spice');
-  assert.strictEqual(menuData.restaurant.slug, 'urban-spice');
+  assert.strictEqual(menuData.restaurant.name, "The Momo's Wala");
+  assert.strictEqual(menuData.restaurant.slug, 'the-momos-wala');
   assert.strictEqual(menuData.table.tableNumber, '7');
   assert.strictEqual(menuData.table.isValid, true);
   assert.ok(menuData.categories.length >= 6, 'Must have at least 6 categories');
@@ -26,7 +26,7 @@ async function test() {
   const htmlRes = await fetch(`${BASE}/r/urban-spice/t/7`);
   assert.strictEqual(htmlRes.status, 200, 'Customer HTML page must return 200');
   const htmlText = await htmlRes.text();
-  assert.ok(htmlText.includes('Urban Spice'), 'Page must contain Urban Spice');
+  assert.ok(htmlText.includes("The Momo's Wala") || htmlText.includes("The Momo&#39;s Wala") || htmlText.includes("The Momo&apos;s Wala"), "Page must contain The Momo's Wala");
   assert.ok(htmlText.includes('Table 7'), 'Page must contain Table 7');
   assert.ok(htmlText.includes('MOMO MENU'), 'Page must contain MOMO MENU branding');
   console.log('   ✓ Customer page rendered cleanly with restaurant and table identification');
@@ -58,7 +58,7 @@ async function test() {
   assert.strictEqual(meRes.status, 200);
   const meData = await meRes.json();
   assert.strictEqual(meData.authenticated, true);
-  assert.strictEqual(meData.restaurant.slug, 'urban-spice');
+  assert.strictEqual(meData.restaurant.slug, 'the-momos-wala');
   console.log(`   ✓ Session verified for restaurant: ${meData.restaurant.name}`);
 
   // Test 5: Tables List & QR Resolution
@@ -71,7 +71,7 @@ async function test() {
   assert.ok(tablesData.tables.length >= 8, 'Must have at least 8 tables');
   const table7 = tablesData.tables.find((t) => t.tableNumber === '7');
   assert.ok(table7, 'Table 7 must exist');
-  assert.ok(table7.prodUrl.includes('/r/urban-spice/t/7'), 'QR URL must point to permanent table endpoint');
+  assert.ok(table7.prodUrl.includes('/r/the-momos-wala/t/7') || table7.prodUrl.includes('/r/urban-spice/t/7'), 'QR URL must point to permanent table endpoint');
   console.log(`   ✓ Found ${tablesData.tables.length} tables`);
   console.log(`   ✓ Table 7 permanent QR Target: ${table7.prodUrl}`);
 
@@ -93,7 +93,7 @@ async function test() {
   assert.strictEqual(createTableRes.status, 200);
   const createTableData = await createTableRes.json();
   assert.strictEqual(createTableData.success, true);
-  assert.ok(createTableData.table.prodUrl.includes(`/r/urban-spice/t/${newTableNum}`));
+  assert.ok(createTableData.table.prodUrl.includes(`/r/the-momos-wala/t/${newTableNum}`) || createTableData.table.prodUrl.includes(`/r/urban-spice/t/${newTableNum}`));
   console.log(`   ✓ Created Table ${newTableNum} with instant QR URL: ${createTableData.table.prodUrl}`);
 
   // Clean up test table

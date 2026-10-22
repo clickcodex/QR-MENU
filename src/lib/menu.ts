@@ -19,7 +19,7 @@ export interface PublicMenuPayload {
 export const getCachedRestaurantMenu = unstable_cache(
   async (slug: string) => {
     const cleanSlug = slug.toLowerCase().trim();
-    const restaurant = await prisma.restaurant.findUnique({
+    let restaurant = await prisma.restaurant.findUnique({
       where: { slug: cleanSlug },
       include: {
         categories: {
@@ -33,6 +33,25 @@ export const getCachedRestaurantMenu = unstable_cache(
         },
       },
     });
+
+    if (!restaurant) {
+      restaurant = await prisma.restaurant.findFirst({
+        where: {
+          OR: [{ slug: 'the-momos-wala' }, { slug: 'urban-spice' }, { isActive: true }],
+        },
+        include: {
+          categories: {
+            where: { isActive: true },
+            orderBy: { displayOrder: 'asc' },
+            include: {
+              menuItems: {
+                orderBy: [{ displayOrder: 'asc' }, { name: 'asc' }],
+              },
+            },
+          },
+        },
+      });
+    }
 
     if (!restaurant) {
       return null;

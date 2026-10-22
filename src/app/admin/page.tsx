@@ -97,7 +97,7 @@ export default function AdminDashboardPage() {
               <span>DINE-IN DIGITAL PLATFORM</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-[#1C1917] tracking-tight">
-              Welcome back, {restaurant?.name || 'Urban Spice'}
+              Welcome back, {restaurant?.name || "The Momo's Wala"}
             </h1>
             <p className="text-xs sm:text-sm text-[#78716C] mt-1">
               Your digital menu is live and ready for guests to scan and browse without friction.

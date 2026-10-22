@@ -9,10 +9,10 @@ import {
   Flame,
   UtensilsCrossed,
   Sparkles,
-  ShoppingBag,
   ArrowRight,
   ShieldCheck,
   RefreshCw,
+  Plus,
 } from 'lucide-react';
 import { OrderStatusPath, OrderStatus } from '../common/OrderStatusPath';
 import { DietaryIndicator } from './DietaryIndicator';
@@ -46,6 +46,9 @@ interface LiveOrderModalProps {
   currencySymbol?: string;
   onOrderMoreDishes?: () => void;
   onClearOrder?: () => void;
+  onOpenModify?: () => void;
+  isModifiable?: boolean;
+  remainingModSeconds?: number;
 }
 
 export function LiveOrderModal({
@@ -55,8 +58,18 @@ export function LiveOrderModal({
   currencySymbol = '₹',
   onOrderMoreDishes,
   onClearOrder,
+  onOpenModify,
+  isModifiable = false,
+  remainingModSeconds = 0,
 }: LiveOrderModalProps) {
   if (!isOpen || !order) return null;
+
+  const formatCountdown = (totalSec: number) => {
+    if (totalSec <= 0) return '00:00';
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
 
   const isPending = order.status === 'PENDING';
   const isAccepted = order.status === 'ACCEPTED';
@@ -212,24 +225,29 @@ export function LiveOrderModal({
             <OrderStatusPath currentStatus={order.status} size="sm" />
           </div>
 
-          {/* Itemized Receipt Breakdown */}
+          {/* Confirmed Food Items (Numbered, Quantities, Food Type Indicators, Zero Monetary Amounts) */}
           <div className="bg-[#FFFDF8] rounded-2xl p-4 border border-[#F5EAD4] text-left space-y-3">
             <div className="flex items-center justify-between text-xs border-b border-[#F5EAD4] pb-2 text-[#78716C]">
               <span className="font-bold text-[#1C1917] uppercase tracking-wider text-[11px]">
-                Ordered Dishes ({order.orderItems?.reduce((a, b) => a + b.quantity, 0) || 0})
+                Confirmed Items ({order.orderItems?.reduce((a, b) => a + b.quantity, 0) || 0})
               </span>
-              <span>Qty × Price</span>
+              <span className="font-semibold text-[11px]">
+                Quantity
+              </span>
             </div>
 
-            <div className="space-y-2 text-xs divide-y divide-[#F5EAD4]/50">
-              {order.orderItems?.map((oi) => (
-                <div key={oi.id} className="pt-2 first:pt-0 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 font-medium text-[#1C1917]">
+            <div className="space-y-2.5 text-xs divide-y divide-[#F5EAD4]/50">
+              {order.orderItems?.map((oi, index) => (
+                <div key={oi.id} className="pt-2.5 first:pt-0 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 font-medium text-[#1C1917] min-w-0">
+                    <span className="text-xs font-bold text-[#78716C] w-5 flex-shrink-0">
+                      {index + 1}.
+                    </span>
                     <DietaryIndicator isVeg={oi.isVeg} size="sm" />
-                    <span>{oi.name}</span>
+                    <span className="truncate font-semibold">{oi.name}</span>
                   </div>
-                  <div className="font-semibold text-[#57534E]">
-                    {oi.quantity} × {currencySymbol}{oi.price} = {currencySymbol}{oi.total}
+                  <div className="font-bold text-[#1C1917] bg-white border border-[#E5DFB0] px-2.5 py-1 rounded-xl text-xs flex-shrink-0 shadow-2xs">
+                    Qty: {oi.quantity}
                   </div>
                 </div>
               ))}
@@ -240,43 +258,80 @@ export function LiveOrderModal({
                 <strong>Special Note:</strong> {order.notes}
               </div>
             )}
-
-            {/* Bill Summary */}
-            <div className="pt-2 border-t border-[#F5EAD4] space-y-1.5 text-xs">
-              <div className="flex justify-between text-[#78716C]">
-                <span>Item Subtotal</span>
-                <span>{currencySymbol}{order.subtotal?.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-[#78716C]">
-                <span>Restaurant GST (5%)</span>
-                <span>{currencySymbol}{order.tax?.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-base font-black text-[#1C1917] pt-2 border-t border-[#F5EAD4]">
-                <span>Total Bill</span>
-                <span className="text-[#E86326]">
-                  {currencySymbol}{order.total?.toFixed(2)}
-                </span>
-              </div>
-            </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-2 pt-2">
+          {/* 5-Minute Order Modification Window (if active) */}
+          {isModifiable && remainingModSeconds > 0 && (() => {
+            const isOrderAccepted = Boolean(order?.status && order.status !== 'PENDING');
+            return (
+              <div
+                className={`p-3 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-left ${
+                  isOrderAccepted
+                    ? 'bg-orange-50 border-orange-200 text-orange-950'
+                    : 'bg-amber-50 border-amber-200 text-amber-900'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <Clock className={`w-4 h-4 animate-spin flex-shrink-0 ${isOrderAccepted ? 'text-[#E86326]' : 'text-amber-600'}`} />
+                  <span>
+                    {isOrderAccepted ? (
+                      <>
+                        Order Accepted: <strong>{formatCountdown(remainingModSeconds)}</strong> left to add more dishes
+                      </>
+                    ) : (
+                      <>
+                        5-Minute Edit Window: <strong>{formatCountdown(remainingModSeconds)}</strong> left (Dishes can be removed)
+                      </>
+                    )}
+                  </span>
+                </div>
+                {onOpenModify && (
+                  isOrderAccepted ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenModify();
+                      }}
+                      className="w-full sm:w-auto px-4 py-1.5 rounded-xl bg-[#E86326] text-white font-bold hover:bg-[#D34F15] text-xs shadow-2xs transition text-center flex items-center justify-center gap-1.5 flex-shrink-0"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>+ Add Dishes</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenModify();
+                      }}
+                      className="w-full sm:w-auto px-3.5 py-1.5 rounded-xl bg-white border border-amber-300 text-amber-950 font-bold hover:bg-[#FFFDF8] text-xs shadow-2xs transition text-center flex items-center justify-center gap-1.5 flex-shrink-0"
+                    >
+                      <UtensilsCrossed className="w-3.5 h-3.5 text-[#E86326]" />
+                      <span>Modify / Remove Dishes</span>
+                    </button>
+                  )
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Back to Menu & Action Buttons */}
+          <div className="pt-2 space-y-2">
             <button
-              onClick={() => {
-                onClose();
-                if (onOrderMoreDishes) onOrderMoreDishes();
-              }}
-              className="w-full py-3.5 px-4 rounded-2xl bg-[#E86326] hover:bg-[#D34F15] text-white text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 shadow-hover"
+              type="button"
+              onClick={onClose}
+              className="w-full py-3 rounded-2xl bg-[#E86326] hover:bg-[#D34F15] text-white text-xs font-bold transition shadow-sm flex items-center justify-center gap-2"
             >
-              <ShoppingBag className="w-4 h-4" />
-              <span>Browse Menu & Add More Dishes</span>
+              <span>Back to Menu</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
             {(isServed || isCompleted) && onClearOrder && (
               <button
+                type="button"
                 onClick={onClearOrder}
-                className="w-full py-2.5 text-xs text-[#78716C] hover:text-[#1C1917] font-semibold transition"
+                className="w-full py-2.5 rounded-2xl border border-[#E5E5DE] text-xs text-[#78716C] hover:text-[#1C1917] font-semibold transition hover:bg-[#FAFAF8]"
               >
                 Clear Completed Order
               </button>

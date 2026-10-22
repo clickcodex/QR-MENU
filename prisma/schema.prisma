@@ -53,6 +53,7 @@ model Restaurant {
   menuItems          MenuItem[]
   tables             Table[]
   orders             Order[]
+  reservations       Reservation[]
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
 
@@ -102,17 +103,22 @@ model MenuItem {
 }
 
 model Table {
-  id           String     @id @default(cuid())
-  tableNumber  String
-  name         String?
-  capacity     Int        @default(4)
-  isActive     Boolean    @default(true)
-  restaurantId String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  qrTokens     QRToken[]
-  orders       Order[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id                     String        @id @default(cuid())
+  tableNumber            String
+  name                   String?
+  capacity               Int           @default(4)
+  status                 String        @default("AVAILABLE") // AVAILABLE, RESERVED, OCCUPIED, AWAITING_CHECKOUT
+  currentReservationId   String?
+  currentControllerToken String?
+  controllerName         String?
+  isActive               Boolean       @default(true)
+  restaurantId           String
+  restaurant             Restaurant    @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  qrTokens               QRToken[]
+  orders                 Order[]
+  reservations           Reservation[]
+  createdAt              DateTime      @default(now())
+  updatedAt              DateTime      @updatedAt
 
   @@unique([restaurantId, tableNumber])
   @@index([restaurantId])
@@ -134,26 +140,59 @@ model QRToken {
   @@map("qr_tokens")
 }
 
+model Reservation {
+  id                 String     @id @default(cuid())
+  restaurantId       String
+  restaurant         Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  tableId            String
+  table              Table      @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  tableNumber        String
+  controllerToken    String     // Session token of customer who owns the table session
+  customerName       String?
+  status             String     @default("TEMPORARY") // TEMPORARY, CONFIRMED, EXPIRED, CANCELLED
+  reservationType    String     @default("QR_SCAN") // QR_SCAN (30m), ADVANCE (60m)
+  expiresAt          DateTime
+  cancelledAt        DateTime?
+  cancelledBy        String?
+  cancellationReason String?
+  orders             Order[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  @@index([restaurantId])
+  @@index([tableId])
+  @@index([controllerToken])
+  @@index([status])
+  @@map("reservations")
+}
+
 model Order {
-  id           String      @id @default(cuid())
-  orderNumber  Int         @default(1001)
-  restaurantId String
-  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  tableId      String?
-  table        Table?      @relation(fields: [tableId], references: [id], onDelete: SetNull)
-  tableNumber  String
-  customerName String?
-  notes        String?
-  status       String      @default("PENDING") // PENDING, ACCEPTED, PREPARING, SERVED, COMPLETED, CANCELLED
-  subtotal     Float
-  tax          Float       @default(0)
-  total        Float
-  orderItems   OrderItem[]
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id                   String       @id @default(cuid())
+  orderNumber          Int          @default(1001)
+  restaurantId         String
+  restaurant           Restaurant   @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  tableId              String?
+  table                Table?       @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  tableNumber          String
+  customerName         String?
+  notes                String?
+  status               String       @default("PENDING") // PENDING, ACCEPTED, PREPARING, SERVED, COMPLETED, CANCELLED
+  controllerToken      String?      // Auth token of the table controller who placed this order
+  reservationId        String?
+  reservation          Reservation? @relation(fields: [reservationId], references: [id], onDelete: SetNull)
+  confirmedAt          DateTime?    // Authoritative confirmation time
+  modificationDeadline DateTime?    // Authoritative 5-minute modification window deadline
+  subtotal             Float
+  tax                  Float        @default(0)
+  total                Float
+  orderItems           OrderItem[]
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
 
   @@index([restaurantId])
   @@index([tableNumber])
+  @@index([reservationId])
+  @@index([controllerToken])
   @@map("orders")
 }
 

@@ -21,6 +21,13 @@ export async function GET(req: Request) {
   const localBaseUrl = `http://localhost:${port}`;
   const prodBaseUrl = process.env.NEXT_PUBLIC_PROD_URL || 'https://menu.clickcodex.in';
 
+  // Run lazy cleanup for expired reservations
+  const { expireStaleReservations, ORDER_MODIFICATION_WINDOW_MS } = await import('@/lib/reservation');
+  await expireStaleReservations(session.restaurant.id);
+
+  const now = new Date();
+  const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+
   const tables = await prisma.table.findMany({
     where: { restaurantId: session.restaurant.id },
     orderBy: { tableNumber: 'asc' },
@@ -29,20 +36,92 @@ export async function GET(req: Request) {
         take: 1,
         orderBy: { createdAt: 'desc' },
       },
+      reservations: {
+        where: { status: 'TEMPORARY', expiresAt: { gt: now } },
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+      },
+      orders: {
+        where: {
+          status: { in: ['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'DELIVERED', 'SERVED'] },
+          createdAt: { gte: fourHoursAgo },
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+        include: {
+          orderItems: true,
+        },
+      },
     },
   });
 
-  // Attach enriched URLs
+  // Attach enriched URLs and live statuses
   const enrichedTables = tables.map((t) => {
     const networkUrl = `${lanBaseUrl}/r/${encodeURIComponent(session.restaurant.slug)}/t/${encodeURIComponent(t.tableNumber)}`;
     const localUrl = `${localBaseUrl}/r/${encodeURIComponent(session.restaurant.slug)}/t/${encodeURIComponent(t.tableNumber)}`;
     const prodUrl = `${prodBaseUrl.replace(/\/$/, '')}/r/${encodeURIComponent(session.restaurant.slug)}/t/${encodeURIComponent(t.tableNumber)}`;
+
+    const activeRes = t.reservations[0] || null;
+    const activeOrd = t.orders[0] || null;
+
+    let computedStatus = t.status || 'AVAILABLE';
+    if (activeOrd) {
+      computedStatus = activeOrd.status === 'SERVED' ? 'AWAITING_CHECKOUT' : 'OCCUPIED';
+    } else if (activeRes) {
+      computedStatus = 'RESERVED';
+    } else {
+      computedStatus = 'AVAILABLE';
+    }
+
+    let activeOrderData = null;
+    if (activeOrd) {
+      const confirmedTime = activeOrd.confirmedAt || activeOrd.createdAt;
+      const deadline = activeOrd.modificationDeadline || new Date(confirmedTime.getTime() + ORDER_MODIFICATION_WINDOW_MS);
+      const remainingModMs = Math.max(0, deadline.getTime() - now.getTime());
+      const isLocked = ['SERVED', 'COMPLETED', 'CANCELLED'].includes(activeOrd.status);
+
+      activeOrderData = {
+        id: activeOrd.id,
+        orderNumber: activeOrd.orderNumber,
+        status: activeOrd.status,
+        customerName: activeOrd.customerName,
+        total: activeOrd.total,
+        itemsCount: activeOrd.orderItems.reduce((acc, item) => acc + item.quantity, 0),
+        confirmedAt: confirmedTime.toISOString(),
+        modificationDeadline: deadline.toISOString(),
+        remainingModSeconds: Math.floor(remainingModMs / 1000),
+        isModifiable: remainingModMs > 0 && !isLocked,
+      };
+    }
+
+    let activeReservationData = null;
+    if (activeRes) {
+      const remainingMs = Math.max(0, activeRes.expiresAt.getTime() - now.getTime());
+      activeReservationData = {
+        id: activeRes.id,
+        customerName: activeRes.customerName,
+        status: activeRes.status,
+        reservationType: activeRes.reservationType,
+        expiresAt: activeRes.expiresAt.toISOString(),
+        remainingSeconds: Math.floor(remainingMs / 1000),
+        createdAt: activeRes.createdAt.toISOString(),
+      };
+    }
+
     return {
-      ...t,
+      id: t.id,
+      tableNumber: t.tableNumber,
+      name: t.name,
+      capacity: t.capacity,
+      isActive: t.isActive,
+      status: computedStatus,
+      currentControllerToken: t.currentControllerToken,
+      controllerName: t.controllerName,
+      activeReservation: activeReservationData,
+      activeOrder: activeOrderData,
       networkUrl,
       localUrl,
       prodUrl,
-      // Default QR to networkUrl so phone scans work out-of-the-box on local Wi-Fi
       qrUrl: networkUrl,
     };
   });

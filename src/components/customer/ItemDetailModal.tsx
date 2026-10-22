@@ -11,6 +11,7 @@ interface ItemDetailModalProps {
   currencySymbol?: string;
   tableName?: string | null;
   cartQty?: number;
+  isController?: boolean;
   onClose: () => void;
   onAddToCart?: (item: MenuItemData) => void;
   onUpdateCartQty?: (itemId: string, delta: number) => void;
@@ -21,6 +22,7 @@ export function ItemDetailModal({
   currencySymbol = '₹',
   tableName,
   cartQty = 0,
+  isController = true,
   onClose,
   onAddToCart,
   onUpdateCartQty,
@@ -85,7 +87,7 @@ export function ItemDetailModal({
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center bg-[#F7F5F0] text-[#A8A29E]">
                 <span className="text-4xl mb-2">🍽️</span>
-                <span className="text-xs font-medium">Urban Spice Signature Recipe</span>
+                <span className="text-xs font-medium">The Momo&apos;s Wala Signature Recipe</span>
               </div>
             )}
 
@@ -172,7 +174,11 @@ export function ItemDetailModal({
           </div>
 
           {item.isAvailable ? (
-            cartQty > 0 ? (
+            !isController ? (
+              <div className="px-4 py-2.5 rounded-xl bg-stone-100 text-stone-600 text-xs font-semibold border border-stone-200">
+                Guest View Only
+              </div>
+            ) : cartQty > 0 ? (
               <div className="flex items-center gap-3 bg-[#FFF7ED] border border-[#FED7AA] rounded-2xl px-3 py-1.5 shadow-sm">
                 <button
                   onClick={() => onUpdateCartQty && onUpdateCartQty(item.id, -1)}

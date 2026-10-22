@@ -10,7 +10,8 @@ export type OrderStatus =
   | 'PREPARING'
   | 'READY'
   | 'SERVED'
-  | 'COMPLETED';
+  | 'COMPLETED'
+  | 'CANCELLED';
 
 export const ORDER_STATUS_STEPS: Array<{ key: string; label: string; shortDesc: string }> = [
   { key: 'PENDING', label: '1. PENDING', shortDesc: 'New Order' },
@@ -25,6 +26,26 @@ interface OrderStatusPathProps {
 }
 
 export function OrderStatusPath({ currentStatus, size = 'md', compact = false }: OrderStatusPathProps) {
+  if (currentStatus === 'CANCELLED') {
+    return (
+      <div className="w-full space-y-1">
+        <div className="flex items-center justify-between text-[11px] font-bold text-rose-700 uppercase tracking-wider">
+          <span>Order Status</span>
+          <span className="text-[10px] text-rose-500 font-semibold normal-case">
+            Fully Cancelled
+          </span>
+        </div>
+        <div className="w-full py-1.5 px-3 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-rose-500" />
+            <span>Order Fully Cancelled</span>
+          </span>
+          <span className="text-[11px] font-medium text-rose-600">Dishes Removed</span>
+        </div>
+      </div>
+    );
+  }
+
   // Normalize status into the 3 core stages
   let normalizedKey = 'PENDING';
   if (currentStatus === 'ACCEPTED' || currentStatus === 'PREPARING' || currentStatus === 'READY') {

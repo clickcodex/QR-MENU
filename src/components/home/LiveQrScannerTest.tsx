@@ -28,12 +28,12 @@ export function LiveQrScannerTest() {
         setLanIp(ip);
         setPort(p);
 
-        const targetUrl = `http://${ip}:${p}/r/urban-spice/t/7`;
+        const targetUrl = `http://${ip}:${p}/r/the-momos-wala/t/7`;
         setActiveUrl(targetUrl);
         generateQRCodeDataURL(targetUrl, 360).then(setQrDataUrl);
       })
       .catch(() => {
-        const fallback = `http://192.168.29.212:${currentPort}/r/urban-spice/t/7`;
+        const fallback = `http://192.168.29.212:${currentPort}/r/the-momos-wala/t/7`;
         setActiveUrl(fallback);
         generateQRCodeDataURL(fallback, 360).then(setQrDataUrl);
       });
@@ -43,8 +43,8 @@ export function LiveQrScannerTest() {
     setMode(newMode);
     const target =
       newMode === 'wifi'
-        ? `http://${lanIp}:${port}/r/urban-spice/t/7`
-        : `http://localhost:${port}/r/urban-spice/t/7`;
+        ? `http://${lanIp}:${port}/r/the-momos-wala/t/7`
+        : `http://localhost:${port}/r/the-momos-wala/t/7`;
     setActiveUrl(target);
     generateQRCodeDataURL(target, 360).then(setQrDataUrl);
   };
@@ -124,7 +124,7 @@ export function LiveQrScannerTest() {
               <span className="w-5 h-5 rounded-full bg-[#FFF7ED] text-[#E86326] font-bold text-[11px] flex items-center justify-center flex-shrink-0 mt-0.5">
                 3
               </span>
-              <span>Tap the link that appears: <strong>Urban Spice Table 7 opens instantly!</strong></span>
+              <span>Tap the link that appears: <strong>The Momo&apos;s Wala Table 7 opens instantly!</strong></span>
             </div>
           </div>
 

@@ -33,13 +33,13 @@ export function MenuSkeleton() {
         </div>
 
         {/* Item Cards Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-2 gap-2.5 sm:gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-              className="p-3.5 rounded-2xl bg-white border border-[#EAEAE5] flex flex-col sm:flex-row gap-3.5"
+              className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white border border-[#EAEAE5] flex flex-col sm:flex-row gap-2.5 sm:gap-3.5"
             >
-              <div className="w-full sm:w-28 h-32 rounded-xl bg-[#F4F4F0] shimmer-effect flex-shrink-0" />
+              <div className="w-full sm:w-28 h-28 sm:h-32 rounded-lg sm:rounded-xl bg-[#F4F4F0] shimmer-effect flex-shrink-0" />
               <div className="flex-1 space-y-2 py-1">
                 <div className="w-12 h-3.5 bg-[#EFEFEA] rounded" />
                 <div className="w-3/4 h-5 bg-[#EAEAE5] rounded" />

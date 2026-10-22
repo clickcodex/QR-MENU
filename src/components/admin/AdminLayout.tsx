@@ -329,7 +329,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center gap-2 text-xs text-[#78716C]">
             <span className="font-semibold text-[#1C1917]">Restaurant Workspace</span>
             <span>/</span>
-            <span className="font-medium text-[#E86326]">{restaurant?.name || 'Urban Spice'}</span>
+            <span className="font-medium text-[#E86326]">{restaurant?.name || "The Momo's Wala"}</span>
           </div>
 
           <div className="flex items-center gap-3">

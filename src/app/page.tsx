@@ -55,7 +55,7 @@ export default function HomePage() {
             </Link>
 
             <Link
-              href="/r/urban-spice/t/7"
+              href="/r/the-momos-wala/t/7"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1C1917] text-white hover:bg-[#322F2D] text-xs font-bold transition shadow-sm"
             >
               <span>Scan Menu</span>
@@ -88,7 +88,7 @@ export default function HomePage() {
           {/* Quick Access CTA Buttons */}
           <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/r/urban-spice/t/7"
+              href="/r/the-momos-wala/t/7"
               className="py-3 px-6 rounded-2xl bg-[#E86326] hover:bg-[#D34F15] text-white text-xs sm:text-sm font-bold transition shadow-hover flex items-center gap-2 group"
             >
               <Smartphone className="w-4 h-4" />
@@ -97,7 +97,7 @@ export default function HomePage() {
             </Link>
 
             <Link
-              href="/r/urban-spice/t/1"
+              href="/r/the-momos-wala/t/1"
               className="py-3 px-5 rounded-2xl bg-white hover:bg-[#FAFAF8] border border-[#E5E5DE] text-[#1C1917] text-xs sm:text-sm font-bold transition shadow-subtle flex items-center gap-2"
             >
               <span>Try Table 1</span>
@@ -160,7 +160,7 @@ export default function HomePage() {
               </p>
               <div className="pt-2">
                 <Link
-                  href="/r/urban-spice/t/7"
+                  href="/r/the-momos-wala/t/7"
                   className="text-xs font-bold text-[#E86326] hover:underline inline-flex items-center gap-1"
                 >
                   <span>Launch Live Mobile Demo</span>
@@ -178,7 +178,7 @@ export default function HomePage() {
                 Permanent Dynamic QR URLs
               </h3>
               <p className="text-xs text-[#57534E] leading-relaxed">
-                QR codes store pure URLs (<code className="text-[#1C1917]">/r/urban-spice/t/7</code>). Modify prices, dishes, or images in the admin without ever reprinting your table cards.
+                QR codes store pure URLs (<code className="text-[#1C1917]">/r/the-momos-wala/t/7</code>). Modify prices, dishes, or images in the admin without ever reprinting your table cards.
               </p>
               <div className="pt-2">
                 <Link
@@ -249,7 +249,7 @@ export default function HomePage() {
               <ul className="text-xs text-[#57534E] space-y-2">
                 <li>• One compact QR stand card placed on Table 7</li>
                 <li>• Every guest scans with their default smartphone camera</li>
-                <li>• Website opens instantly: Urban Spice, Table 7 identified</li>
+                <li>• Website opens instantly: The Momo&apos;s Wala, Table 7 identified</li>
                 <li>• 15 diners simultaneously browse appetizers, breads, & drinks</li>
                 <li>• Instant search, dietary filters, and sold-out updates</li>
               </ul>
@@ -276,7 +276,7 @@ export default function HomePage() {
           </p>
 
           <div className="pt-2 text-xs text-[#78716C] flex items-center justify-center gap-4">
-            <Link href="/r/urban-spice/t/7" className="hover:text-[#1C1917]">
+            <Link href="/r/the-momos-wala/t/7" className="hover:text-[#1C1917]">
               Customer Menu (Table 7)
             </Link>
             <span>•</span>
